@@ -1,11 +1,11 @@
-delete 
+***delete 
 
 {
     "pet_id": 1
 }
 
 
-put
+***put
 
 {
     "pet_id": 1,
@@ -28,7 +28,7 @@ put
     "health_issues": "No known health issues."
 }
 
-post
+***post
 
 {
     "owner_id": 1,  // Replace with a valid user ID
@@ -48,3 +48,5 @@ post
     "cuddliness_level": 2,
     "health_issues": "No known health issues."
 }
+
+
