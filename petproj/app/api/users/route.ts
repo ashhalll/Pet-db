@@ -1,6 +1,9 @@
-import { createClient } from '../../../db/index.js';
+// pages/api/users/route.ts
+import { createClient } from '../../../db/index'; 
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(req) {
+// POST method to create a new user
+export async function POST(req: NextRequest): Promise<NextResponse> {
     const { username, name, DOB, city_id, email, password, phone_number, role } = await req.json();
     const client = createClient();
 
@@ -10,43 +13,51 @@ export async function POST(req) {
             'INSERT INTO users (username, name, DOB, city_id, email, password, phone_number, role, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, CURRENT_TIMESTAMP) RETURNING *',
             [username, name, DOB, city_id, email, password, phone_number, role]
         );
-        return new Response(JSON.stringify(result.rows[0]), {
+        return NextResponse.json(result.rows[0], {
             status: 201,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (err) {
         console.error(err);
-        return new Response(JSON.stringify({ error: 'Internal Server Error', message: err.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(
+            { error: 'Internal Server Error', message: (err as Error).message },
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
     } finally {
         await client.end();
     }
 }
 
-export async function GET(req) {
+// GET method to fetch all users
+export async function GET(req: NextRequest): Promise<NextResponse> {
     const client = createClient();
 
     try {
         await client.connect(); 
         const result = await client.query('SELECT * FROM users');
-        return new Response(JSON.stringify(result.rows), {
+        return NextResponse.json(result.rows, {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (err) {
         console.error(err);
-        return new Response(JSON.stringify({ error: 'Internal Server Error', message: err.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(
+            { error: 'Internal Server Error', message: (err as Error).message },
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
     } finally {
         await client.end(); 
     }
 }
 
-export async function PUT(req) {
+// PUT method to update a user by ID
+export async function PUT(req: NextRequest): Promise<NextResponse> {
     const { user_id, username, name, DOB, city_id, email, password, phone_number, role } = await req.json();
     const client = createClient();
 
@@ -58,29 +69,32 @@ export async function PUT(req) {
         );
         
         if (result.rows.length === 0) {
-            return new Response(JSON.stringify({ error: 'User not found' }), {
+            return NextResponse.json({ error: 'User not found' }, {
                 status: 404,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
-        return new Response(JSON.stringify(result.rows[0]), {
+        return NextResponse.json(result.rows[0], {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (err) {
         console.error(err);
-        return new Response(JSON.stringify({ error: 'Internal Server Error', message: err.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(
+            { error: 'Internal Server Error', message: (err as Error).message },
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
     } finally {
         await client.end();
     }
 }
 
-
-export async function DELETE(req) {
+// DELETE method to delete a user by ID
+export async function DELETE(req: NextRequest): Promise<NextResponse> {
     const { user_id } = await req.json(); // Assuming you're sending the user_id in the body of the DELETE request
     const client = createClient();
 
@@ -89,22 +103,25 @@ export async function DELETE(req) {
         const result = await client.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [user_id]);
 
         if (result.rows.length === 0) {
-            return new Response(JSON.stringify({ error: 'User not found' }), {
+            return NextResponse.json({ error: 'User not found' }, {
                 status: 404,
                 headers: { 'Content-Type': 'application/json' },
             });
         }
 
-        return new Response(JSON.stringify({ message: 'User deleted successfully' }), {
+        return NextResponse.json({ message: 'User deleted successfully' }, {
             status: 200,
             headers: { 'Content-Type': 'application/json' },
         });
     } catch (err) {
         console.error(err);
-        return new Response(JSON.stringify({ error: 'Internal Server Error', message: err.message }), {
-            status: 500,
-            headers: { 'Content-Type': 'application/json' },
-        });
+        return NextResponse.json(
+            { error: 'Internal Server Error', message: (err as Error).message },
+            {
+                status: 500,
+                headers: { 'Content-Type': 'application/json' },
+            }
+        );
     } finally {
         await client.end(); // Always close the connection
     }

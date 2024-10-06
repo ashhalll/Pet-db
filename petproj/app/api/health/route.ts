@@ -1,7 +1,8 @@
-// pages/api/health.js
+// pages/api/health.ts
 import { createClient } from "../../../db/index"; 
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(req) {
+export async function GET(req: NextRequest): Promise<NextResponse> {
     const client = createClient();
 
     try {
@@ -9,8 +10,8 @@ export async function GET(req) {
         await client.query("SELECT NOW()"); 
         await client.end();
 
-        return new Response(
-            JSON.stringify({ message: "CONNECTED!" }),
+        return NextResponse.json(
+            { message: "CONNECTED!" },
             {
                 status: 200,
                 headers: {
@@ -19,11 +20,13 @@ export async function GET(req) {
             }
         );
     } catch (err) {
-        return new Response(
-            JSON.stringify({
+        // Cast error to a generic error type to access message
+        const error = err as Error;  
+        return NextResponse.json(
+            {
                 message: "Failed",
-                error: err.message,
-            }),
+                error: error.message,
+            },
             {
                 status: 500,
                 headers: {
