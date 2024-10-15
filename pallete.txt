@@ -1,0 +1,35 @@
+user:
+
+primary: #A03048
+
+dark: #70223f
+
+light: #ffd2e3
+
+tertiary: #ffa6c8
+
+bg: #ffffff 
+
+vet:
+
+primary: #6a398c
+
+dark: #3d2862
+
+light: #e7d9ff
+
+tertiary: #cfb3ff
+
+bg: #ffffff
+
+admin:
+
+primary: #02187b
+
+dark: #012656
+
+light: #c0dcff
+
+tertiary: #82b8ff
+
+bg: #ffffff
