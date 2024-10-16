@@ -4,6 +4,7 @@ const {
   HarmBlockThreshold,
 } = require("@google/generative-ai");
 
+<<<<<<< HEAD
 const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
@@ -27,6 +28,20 @@ async function run() {
  // See https://ai.google.dev/gemini-api/docs/safety-settings
     
   });
+=======
+const apiKey = process.env.API_KEY as string;
+// const genAI = new GoogleGenerativeAI(apiKey);
+
+// const apiKey = process.env.GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(apiKey);
+
+// const model = genAI.getGenerativeModel({
+//   model: "gemini-1.5-flash",
+//   systemInstruction: "You are a chatbot that only provides answers related to pets (animal care, breeds, adoption, health)",
+// });
+
+const systemPrompt = `You are a chatbot that only provides answers related to pets (animal care, breeds, adoption, health)`;
+>>>>>>> upstream/main
 
   const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
   console.log(result.response.text());

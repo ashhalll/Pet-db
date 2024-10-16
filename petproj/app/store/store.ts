@@ -1,17 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-import petReducer from './slices/petSlice'; // Adjust this path if necessary
-import vetReducer from './slices/vetSlice'; // Import the vet slice
+import petReducer from './slices/petSlice';
+import citiesReducer from './slices/citiesSlice';
+import petCategoriesReducer from './slices/petCategoriesSlice';
+import qualificationsReducer from './slices/qualificationsSlice';
+import favoriteThingsReducer from './slices/petFavoriteThingsSlice';
+import vetSlice from './slices/vetSlice';
 
-// Configure the Redux store
 export const store = configureStore({
   reducer: {
-    pets: petReducer, // Pet reducer
-    vets: vetReducer, // Vet reducer added here
+    pets: petReducer,
+    vets: vetSlice,
+    cities: citiesReducer,
+    categories: petCategoriesReducer,
+    qualifications: qualificationsReducer,
+    favoriteThings: favoriteThingsReducer,
   },
 });
 
-// Define RootState type from the store itself
 export type RootState = ReturnType<typeof store.getState>;
-
-// Export dispatch type for use with TypeScript
 export type AppDispatch = typeof store.dispatch;

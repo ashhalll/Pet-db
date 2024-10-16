@@ -1,51 +1,162 @@
-'use client'; // Ensure this is at the top of your file
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchPets } from '../store/slices/petSlice'; // Adjust import as needed
-import Navbar from '@/components/navbar';
-import { RootState, AppDispatch } from '../store/store'; 
+"use client";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPets } from "../store/slices/petSlice";
+import Navbar from "@/components/navbar";
+import VerticalSearchBar from "../../components/VerticalSearchBar";
+import FilterSection from "../../components/FilterSection";
+import PetGrid from "../../components/petGrid";
+import { RootState, AppDispatch } from "../store/store";
+
+import "./styles.css";
 
 export default function BrowsePets() {
-  const dispatch = useDispatch<AppDispatch>();
+    const dispatch = useDispatch<AppDispatch>();
+    const { pets, loading, error } = useSelector(
+        (state: RootState) => state.pets
+    );
 
-  // Access pets, loading, and error from Redux state
-  const { pets, loading, error } = useSelector((state: RootState) => state.pets);
+    // State for filter inputs
+    const [filters, setFilters] = useState({
+        isAdopt: true,
+        selectedSex: "",
+        minAge: "",
+        maxAge: "",
+        minPrice: "",
+        maxPrice: "",
+        area: "",
+        minChildAge: "",
+        canLiveWithDogs: false,
+        canLiveWithCats: false,
+        vaccinated: false,
+        neutered: false,
+        selectedCity: "", // Added selectedCity
+        selectedSpecies: "", // Added selectedSpecies
+        breed: "", // Added breed
+    });
 
-  useEffect(() => {
-    dispatch(fetchPets());
-  }, [dispatch]);
+    useEffect(() => {
+        dispatch(fetchPets());
+    }, [dispatch]);
 
-  // Filter pets for adoption
-  const adoptionPets = pets.filter(pet => pet.listing_type === 'adoption');
+    const handleReset = () => {
+        // Reset filters to their initial state
+        setFilters({
+            isAdopt: true,
+            selectedSex: "",
+            minAge: "",
+            maxAge: "",
+            minPrice: "",
+            maxPrice: "",
+            area: "",
+            minChildAge: "",
+            canLiveWithDogs: false,
+            canLiveWithCats: false,
+            vaccinated: false,
+            neutered: false,
+            selectedCity: "",
+            selectedSpecies: "",
+            breed: "",
+        });
+    };
 
-  return (
-    <>
-      <Navbar />
-      <main className="flex min-h-screen flex-col items-center p-24" style={{ backgroundColor: 'rgb(var(--background-color))' }}>
-        {/* Pets Listing */}
-        <h1 className="text-2xl font-bold mt-0">Pets Available for Adoption</h1>
+    const handleSearch = () => {
+        console.log("Searching with filters:", filters);
+    };
 
-        {loading ? (
-          <p>Loading pets...</p>
-        ) : error ? (
-          <p>Error: {error}</p>
-        ) : adoptionPets.length > 0 ? (
-          <ul className="mt-4 w-full">
-            {adoptionPets.map((pet) => (
-              <li key={pet.pet_id} className="border p-4 mb-2 rounded shadow">
-                <h2 className="text-xl">{pet.pet_name}</h2>
-                <p>Breed: {pet.pet_breed}</p>
-                <p>Age: {pet.age} years</p>
-                <p>Description: {pet.description}</p>
-                <p>Adoption Status: {pet.adoption_status}</p>
-                <p>Adoption Price: {pet.adoption_price}</p>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No pets available for adoption at this time.</p>
-        )}
-      </main>
-    </>
-  );
+    // Filter pets based on the current filters
+    const filteredPets = pets.filter((pet) => {
+        const matchesType = filters.isAdopt
+            ? pet.listing_type === "adoption"
+            : pet.listing_type === "foster";
+        const matchesSex = filters.selectedSex
+            ? pet.sex === filters.selectedSex
+            : true;
+        const matchesMinAge = filters.minAge
+            ? pet.age >= Number(filters.minAge)
+            : true;
+        const matchesMaxAge = filters.maxAge
+            ? pet.age <= Number(filters.maxAge)
+            : true;
+        const matchesMinPrice = filters.minPrice
+            ? Number(pet.adoption_price) >= Number(filters.minPrice)
+            : true;
+        const matchesMaxPrice = filters.maxPrice
+            ? Number(pet.adoption_price) <= Number(filters.maxPrice)
+            : true;
+        const matchesArea = filters.area
+            ? pet.area.includes(filters.area)
+            : true;
+        const matchesMinChildAge = filters.minChildAge
+            ? pet.min_age_of_children >= Number(filters.minChildAge)
+            : true;
+        const matchesDogs = filters.canLiveWithDogs
+            ? pet.can_live_with_dogs
+            : true;
+        const matchesCats = filters.canLiveWithCats
+            ? pet.can_live_with_cats
+            : true;
+        const matchesVaccinated = filters.vaccinated ? pet.vaccinated : true;
+        const matchesNeutered = filters.neutered ? pet.neutered : true;
+        const matchesCity = filters.selectedCity
+            ? pet.city_id === Number(filters.selectedCity)
+            : true;
+        const matchesSpecies = filters.selectedSpecies
+            ? pet.pet_type === Number(filters.selectedSpecies)
+            : true;
+        const matchesBreed = filters.breed
+            ? pet.pet_breed.toLowerCase().includes(filters.breed.toLowerCase())
+            : true;
+
+        return (
+            matchesType &&
+            matchesSex &&
+            matchesMinAge &&
+            matchesMaxAge &&
+            matchesMinPrice &&
+            matchesMaxPrice &&
+            matchesArea &&
+            matchesMinChildAge &&
+            matchesDogs &&
+            matchesCats &&
+            matchesVaccinated &&
+            matchesNeutered &&
+            matchesCity &&
+            matchesSpecies &&
+            matchesBreed
+        );
+    });
+
+    return (
+        <>
+            <Navbar />
+            <div className="fullBody">
+                <FilterSection
+                    onSearch={(filters) =>
+                        setFilters((prev) => ({ ...prev, ...filters }))
+                    }
+                />
+                <main className="flex min-h-screen flex-col items-center p-8 bg-gray-100">
+                    <div className="flex w-full">
+                        <div className="w-1/4 mr-4">
+                            <VerticalSearchBar
+                                onSearch={setFilters} // Pass filters up to parent
+                                onReset={handleReset} // Pass reset function
+                                onSearchAction={handleSearch} // Pass search function
+                            />
+                        </div>
+                        <div className="w-3/4">
+                            {loading ? (
+                                <p>Loading pets...</p>
+                            ) : error ? (
+                                <p>Error: {error}</p>
+                            ) : (
+                                <PetGrid pets={filteredPets} />
+                            )}
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </>
+    );
 }
