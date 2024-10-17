@@ -1,15 +1,15 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchVets } from "../store/slices/vetSlice";  // Importing vetSlice for vet data
+import { fetchVets } from "../store/slices/vetSlice";
 import Navbar from "@/components/navbar";
-import FilterSection from "../../components/FilterSection"; // Filter component
-import PetGrid from "../../components/petGrid";  // To display the vets (can rename later)
+import FilterSection from "../../components/FilterSection";
+import PetGrid from "../../components/petGrid";
 import { RootState, AppDispatch } from "../store/store";
 
 export default function PetCare() {
   const dispatch = useDispatch<AppDispatch>();
-  const { vets, loading, error } = useSelector((state: RootState) => state.vets); // Accessing vet data from Redux
+  const { vets, loading, error } = useSelector((state: RootState) => state.vets);
 
   // State for filter inputs
   const [filters, setFilters] = useState({
@@ -19,7 +19,7 @@ export default function PetCare() {
   });
 
   useEffect(() => {
-    dispatch(fetchVets());  // Fetch the list of vets
+    dispatch(fetchVets());
   }, [dispatch]);
 
   // Reset filters to their initial state
