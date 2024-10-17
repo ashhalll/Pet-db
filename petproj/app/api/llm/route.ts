@@ -1,31 +1,45 @@
-const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } = require("@google/generative-ai");
 
-const apiKey = process.env.GEMINI_API_KEY || process.env.API_KEY; // Handling both possible env variables
+import { NextResponse } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const apiKey = process.env.API_KEY as string;
+// const genAI = new GoogleGenerativeAI(apiKey);
+
+// const apiKey = process.env.GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(apiKey);
 
-const model = genAI.getGenerativeModel({
-  model: "gemini-1.5-flash",
-  systemInstruction: "You are a chatbot that only provides answers related to pets (animal care, breeds, adoption, health)",
-});
+// const model = genAI.getGenerativeModel({
+//   model: "gemini-1.5-flash",
+//   systemInstruction: "You are a chatbot that only provides answers related to pets (animal care, breeds, adoption, health)",
+// });
 
-const generationConfig = {
-  temperature: 2,
-  topP: 0.95,
-  topK: 64,
-  maxOutputTokens: 1024,
-  responseMimeType: "text/plain",
-};
+const systemPrompt = `You are a chatbot that only provides answers related to pets (animal care, breeds, adoption, health)`;
 
-async function run() {
-  const chatSession = model.startChat({
-    generationConfig,
-    // safetySettings: Adjust safety settings
-    // See https://ai.google.dev/gemini-api/docs/safety-settings
-  });
+export async function POST(request: Request): Promise<NextResponse> {
+    try {
+        const body = await request.json();
+        const userPrompt = body.prompt || "Ask me anything related to fashion.";
 
-  const result = await chatSession.sendMessage("INSERT_INPUT_HERE");
-  console.log(result.response.text());
+        const combinedPrompt = `${systemPrompt} The user asks: "${userPrompt}"`;
+
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const result = await model.generateContent(combinedPrompt);
+        const text = await result.response.text();
+
+        return NextResponse.json({
+            success: true,
+            data: text,
+        });
+    } catch (error: any) {
+        console.error("Error processing request:", error);
+
+        return NextResponse.json(
+            {
+                success: false,
+                error: error.message,
+            },
+            { status: 500 }
+        );
+    }
 }
-
-run();
