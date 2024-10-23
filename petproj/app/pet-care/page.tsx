@@ -12,7 +12,6 @@ export default function PetCare() {
 
   // State for filter inputs
   const [filters, setFilters] = useState({
-    age: "",
     degree: "",
     city: ""
   });
@@ -24,7 +23,6 @@ export default function PetCare() {
   // Reset filters to their initial state
   const handleReset = () => {
     setFilters({
-      age: "",
       degree: "",
       city: ""
     });
@@ -37,11 +35,10 @@ export default function PetCare() {
 
   // Filter vets based on the current filters
   const filteredVets = vets.filter((vet) => {
-  //   const matchesAge = filters.age ? vet.age === Number(filters.age) : true;
-  //   const matchesDegree = filters.degree ? vet.degree.includes(filters.degree) : true;
+    const matchesQualification = filters.degree ? vet.degree.includes(filters.degree) : true;
     const matchesCity = filters.city ? vet.city.includes(filters.city) : true;
 
-    return matchesCity;
+    return matchesQualification && matchesCity;
   });
 
   return (
