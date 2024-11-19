@@ -6,10 +6,12 @@ import { fetchCities } from "../store/slices/citiesSlice"; // Fetch cities from 
 import { postUser } from "../store/slices/userSlice";
 import { User } from "../types/user";
 import Navbar from "@/components/navbar";
+import { useRouter } from "next/navigation";
 
 const CreateUser = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { cities } = useSelector((state: RootState) => state.cities); // Fetch cities if needed
+    const router = useRouter();
 
     const [username, setUsername] = useState("");
     const [name, setName] = useState("");
@@ -18,16 +20,15 @@ const CreateUser = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [phone_number, setPhoneNumber] = useState("");
-    const [role, setRole] = useState<"admin" | "regular user" | "vet">(
-        "regular user"
-    );
+    const [role, setRole] = useState<"regular user" | "vet">("regular user");
+
 
     useEffect(() => {
         dispatch(fetchCities()); // Fetch cities when component mounts
     }, [dispatch]);
 
     // Handle form submission
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         const newUser: Omit<User, "user_id"> = {
@@ -41,9 +42,22 @@ const CreateUser = () => {
             role,
         };
 
-        console.log(newUser);
-        // Dispatch postUser action
-        dispatch(postUser(newUser));
+        try {
+            // Dispatch the postUser action and cast the result to access the payload
+            const result = await dispatch(postUser(newUser)) as { payload: User };
+
+            // Check the user's role and navigate accordingly
+            if (result.payload.role === "vet") {
+                // Navigate to the vet registration page with the user_id as a query parameter
+                router.push(`/vet-register?user_id=${result.payload.user_id}`);
+            } else {
+                // Navigate to the dashboard if the user is not a vet
+                router.push("/dashboard");
+            }
+        } catch (error) {
+            console.error("Error creating user:", error);
+            // Handle error (e.g., show an error message to the user)
+        }
     };
 
     return (
@@ -51,7 +65,7 @@ const CreateUser = () => {
             <Navbar />
             <form
                 onSubmit={handleSubmit}
-                className="max-w-md mx-auto p-4 my-7 bg-white shadow-md rounded rounded-xl">
+                className="max-w-md mx-auto p-4 my-7 bg-white shadow-md rounded-xl">
                 <label className="block mb-2">Username</label>
                 <input
                     type="text"
@@ -120,19 +134,15 @@ const CreateUser = () => {
                     required
                 />
 
-                <label className="block mb-2">Role</label>
-                <select
-                    value={role}
-                    onChange={(e) =>
-                        setRole(
-                            e.target.value as "admin" | "regular user" | "vet"
-                        )
-                    }
-                    className="border p-2 rounded w-full mb-4">
-                    <option value="regular user">Regular User</option>
-                    <option value="admin">Admin</option>
-                    <option value="vet">Vet</option>
-                </select>
+                <label className="mb-2 flex items-center">
+                    <input
+                        type="checkbox"
+                        checked={role === "vet"}
+                        onChange={() => setRole((prevRole) => (prevRole === "regular user" ? "vet" : "regular user"))}
+                        className="mr-2 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span>I am a vet</span>
+                </label>
 
                 <button
                     type="submit"

@@ -29,7 +29,9 @@ export default function CreatePetListing() {
     const { categories } = useSelector((state: RootState) => state.categories);
 
     // State for form fields
-    const [listingType, setListingType] = useState("");
+    const [listingType, setListingType] = useState<"adoption" | "foster">(
+        "adoption"
+    );
     const [petName, setPetName] = useState("");
     const [petType, setPetType] = useState("");
     const [breed, setBreed] = useState("");
@@ -112,6 +114,10 @@ export default function CreatePetListing() {
         </button>
     );
 
+    const handleTabToggle = (type: "adoption" | "foster") => {
+        setListingType(type);
+    };
+
     return (
         <>
             <Navbar />
@@ -123,16 +129,33 @@ export default function CreatePetListing() {
                     onSubmit={handleSubmit}>
                     {/* Listing Type */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Listing Type
-                        </label>
-                        <select
-                            className="mt-1 p-3 w-full border rounded-lg"
-                            value={listingType}
-                            onChange={(e) => setListingType(e.target.value)}>
-                            <option value="adoption">Adoption</option>
-                            <option value="foster">Foster</option>
-                        </select>
+                        <div className="w-3/4 tab-switch-container mt-1">
+                            {/* Sliding background for active tab */}
+                            <div
+                                className="tab-switch-slider"
+                                style={{
+                                    transform:
+                                        listingType === "adoption"
+                                            ? "translateX(0)"
+                                            : "translateX(100%)",
+                                }}
+                            />
+                            {/* Tabs */}
+                            <div
+                                className={`tab ${
+                                    listingType === "adoption" ? "active" : ""
+                                }`}
+                                onClick={() => handleTabToggle("adoption")}>
+                                Adopt
+                            </div>
+                            <div
+                                className={`tab ${
+                                    listingType === "foster" ? "active" : ""
+                                }`}
+                                onClick={() => handleTabToggle("foster")}>
+                                Foster
+                            </div>
+                        </div>
                     </div>
 
                     {/* Pet Name */}
@@ -142,6 +165,7 @@ export default function CreatePetListing() {
                         </label>
                         <input
                             type="text"
+                            required
                             className="mt-1 p-3 w-full border rounded-lg"
                             placeholder="Enter pet name"
                             value={petName}
@@ -157,6 +181,7 @@ export default function CreatePetListing() {
                         <select
                             className="mt-1 p-3 w-full border rounded-lg"
                             value={petType}
+                            required
                             onChange={(e) => setPetType(e.target.value)}>
                             <option value="">Select pet type</option>
                             {categories.map((category) => (
@@ -191,6 +216,7 @@ export default function CreatePetListing() {
                         <select
                             className="mt-1 p-3 w-full border rounded-lg"
                             value={cityId}
+                            required
                             onChange={(e) => setCityId(e.target.value)}>
                             <option value="">Select City</option>
                             {cities.map((city) => (
@@ -222,9 +248,10 @@ export default function CreatePetListing() {
                         </label>
                         <input
                             type="text" // Change to text for free input
+                            required
                             className="mt-1 p-3 w-full border rounded-lg"
                             placeholder="Enter age" // Ensure 0 is not in the placeholder
-                            value={age || ''} // Prevent "0" from showing in the input field
+                            value={age || ""} // Prevent "0" from showing in the input field
                             onChange={(e) => {
                                 const value = e.target.value;
                                 // Convert to number; default to 0 if empty or undefined
@@ -232,6 +259,21 @@ export default function CreatePetListing() {
                                 setAge(numberValue);
                             }}
                         />
+                    </div>
+
+                    {/* Sex */}
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Sex
+                        </label>
+                        <select
+                            className="mt-1 p-3 w-full border rounded-lg"
+                            value={sex}
+                            required
+                            onChange={(e) => setSex(e.target.value)}>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
                     </div>
 
                     {/* Age
@@ -248,18 +290,32 @@ export default function CreatePetListing() {
                         />
                     </div> */}
 
-                    {/* Description */}
+                    {/* Vaccinated */}
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">
-                            Description
+                            <input
+                                type="checkbox"
+                                checked={vaccinated}
+                                onChange={(e) =>
+                                    setVaccinated(e.target.checked)
+                                }
+                                className="mr-2"
+                            />
+                            Vaccinated
                         </label>
-                        <textarea
-                            className="mt-1 p-3 w-full border rounded-lg"
-                            placeholder="Describe the pet"
-                            value={description}
-                            onChange={(e) =>
-                                setDescription(e.target.value)
-                            }></textarea>
+                    </div>
+
+                    {/* Neutered */}
+                    <div className="mb-4">
+                        <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                checked={neutered}
+                                onChange={(e) => setNeutered(e.target.checked)}
+                                className="mr-2"
+                            />
+                            Neutered
+                        </label>
                     </div>
 
                     {/* Price */}
@@ -309,6 +365,20 @@ export default function CreatePetListing() {
                         />
                     </div> */}
 
+                    {/* Description */}
+                    <div className="mb-4">
+                        <label className="block text-sm font-medium text-gray-700">
+                            Description
+                        </label>
+                        <textarea
+                            className="mt-1 p-3 w-full border rounded-lg"
+                            placeholder="Describe the pet"
+                            value={description}
+                            onChange={(e) =>
+                                setDescription(e.target.value)
+                            }></textarea>
+                    </div>
+
                     {/* Minimum Age of Children*/}
                     <div className="mb-4">
                         <label className="block text-sm font-medium text-gray-700">
@@ -318,7 +388,7 @@ export default function CreatePetListing() {
                             type="text" // Keep input type as text
                             className="mt-1 p-3 w-full border rounded-lg"
                             placeholder="Enter minimum age"
-                            value={minAgeOfChildren || ''}
+                            value={minAgeOfChildren || ""}
                             onChange={(e) => {
                                 const value = e.target.value;
                                 const numberValue = value ? Number(value) : 0;
@@ -329,10 +399,14 @@ export default function CreatePetListing() {
 
                     <div className="mb-4">
                         <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                            <input type="checkbox"
+                            <input
+                                type="checkbox"
                                 checked={canLiveWithDogs}
-                                onChange={(e) => setCanLiveWithDogs(e.target.checked)}
-                                className="mr-2" />
+                                onChange={(e) =>
+                                    setCanLiveWithDogs(e.target.checked)
+                                }
+                                className="mr-2"
+                            />
                             Can live with dogs
                         </label>
                     </div>
@@ -341,7 +415,9 @@ export default function CreatePetListing() {
                             <input
                                 type="checkbox"
                                 checked={canLiveWithCats}
-                                onChange={(e) => setCanLiveWithCats(e.target.checked)}
+                                onChange={(e) =>
+                                    setCanLiveWithCats(e.target.checked)
+                                }
                                 className="mr-2"
                             />
                             Can live with cats
@@ -350,50 +426,84 @@ export default function CreatePetListing() {
 
                     <div className="mb-4">
                         <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                            <input type="checkbox"
+                            <input
+                                type="checkbox"
                                 checked={mustHaveSomeoneHome}
-                                onChange={(e) => setMustHaveSomeoneHome(e.target.checked)}
-                                className="mr-2" />Must have someone home
+                                onChange={(e) =>
+                                    setMustHaveSomeoneHome(e.target.checked)
+                                }
+                                className="mr-2"
+                            />
+                            Must have someone home
                         </label>
                     </div>
 
                     {/* Energy Level Slider */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Energy Level</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Energy Level
+                        </label>
                         <div className="relative">
                             <input
                                 type="range"
                                 min="1"
                                 max="5"
                                 className="mt-2 w-full"
-                                defaultValue="3"
-                                value={energyLevel} // Controlled value from state
-                                onChange={(e) => setEnergyLevel(Number(e.target.value))}
+                                value={energyLevel ?? 3} // Show 3 as a visual placeholder but don't set it as state
+                                onChange={(e) =>
+                                    setEnergyLevel(Number(e.target.value))
+                                }
+                                onMouseDown={() => {
+                                    if (energyLevel === null) setEnergyLevel(3); // Set to 3 when user interacts
+                                }}
                                 style={{
-                                    background: `linear-gradient(to right, #A03048 0%, #A03048 ${(energyLevel - 1) * 25}%, #D1D5DB ${(energyLevel - 1) * 25}%, #D1D5DB 100%)`, // Color bar up to the thumb
+                                    background: energyLevel
+                                        ? `linear-gradient(to right, #A03048 0%, #A03048 ${
+                                              (energyLevel - 1) * 25
+                                          }%, #D1D5DB ${
+                                              (energyLevel - 1) * 25
+                                          }%, #D1D5DB 100%)`
+                                        : "#D1D5DB", // Default background when unselected
                                 }}
                             />
                             <div className="w-full flex justify-between -top-2">
-                                <span className="text-sm text-gray-500">Chilled</span>
-                                <span className="text-sm text-gray-500">Hyper</span>
+                                <span className="text-sm text-gray-500">
+                                    Chilled
+                                </span>
+                                <span className="text-sm text-gray-500">
+                                    Hyper
+                                </span>
                             </div>
                         </div>
                     </div>
 
-
                     {/* Cuddliness Level */}
                     <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">Cuddliness Level</label>
+                        <label className="block text-sm font-medium text-gray-700">
+                            Cuddliness Level
+                        </label>
                         <div className="relative">
                             <input
                                 type="range"
                                 min="1"
                                 max="5"
                                 className="mt-2 w-full h-2 rounded-lg bg-gray-300 appearance-none"
-                                value={cuddlinessLevel} // Controlled value from state
-                                onChange={(e) => setCuddlinessLevel(Number(e.target.value))}
+                                value={cuddlinessLevel ?? 3} // Show 3 visually, but don't persist
+                                onChange={(e) =>
+                                    setCuddlinessLevel(Number(e.target.value))
+                                }
+                                onMouseDown={() => {
+                                    if (cuddlinessLevel === null)
+                                        setCuddlinessLevel(3); // Set to 3 when user interacts
+                                }}
                                 style={{
-                                    background: `linear-gradient(to right, #A03048 0%, #A03048 ${(cuddlinessLevel - 1) * 25}%, #D1D5DB ${(cuddlinessLevel - 1) * 25}%, #D1D5DB 100%)`, // Color bar up to the thumb
+                                    background: cuddlinessLevel
+                                        ? `linear-gradient(to right, #A03048 0%, #A03048 ${
+                                              (cuddlinessLevel - 1) * 25
+                                          }%, #D1D5DB ${
+                                              (cuddlinessLevel - 1) * 25
+                                          }%, #D1D5DB 100%)`
+                                        : "#D1D5DB", // Default background
                                 }}
                             />
                             <div className="w-full flex justify-between mt-2 text-sm text-gray-500">
@@ -402,7 +512,6 @@ export default function CreatePetListing() {
                             </div>
                         </div>
                     </div>
-
 
                     {/* Health Issues */}
                     <div className="mb-4">
@@ -416,49 +525,6 @@ export default function CreatePetListing() {
                             value={healthIssues}
                             onChange={(e) => setHealthIssues(e.target.value)}
                         />
-                    </div>
-
-                    {/* Sex */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                            Sex
-                        </label>
-                        <select
-                            className="mt-1 p-3 w-full border rounded-lg"
-                            value={sex}
-                            onChange={(e) => setSex(e.target.value)}>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                        </select>
-                    </div>
-
-                    {/* Vaccinated */}
-                    <div className="mb-4">
-                        <label className="block text-sm font-medium text-gray-700">
-                            <input
-                                type="checkbox"
-                                checked={vaccinated}
-                                onChange={(e) =>
-                                    setVaccinated(e.target.checked)
-                                }
-                                className="mr-2"
-                            />
-                            Vaccinated
-                        </label>
-
-                    </div>
-
-                    {/* Neutered */}
-                    <div className="mb-4">
-                        <label className="flex items-center text-sm font-medium text-gray-700 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                checked={neutered}
-                                onChange={(e) => setNeutered(e.target.checked)}
-                                className="mr-2"
-                            />
-                            Neutered
-                        </label>
                     </div>
 
                     <div className="mb-4">
