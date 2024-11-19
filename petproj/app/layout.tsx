@@ -21,6 +21,9 @@ export default function RootLayout({
 }: {
     children: React.ReactNode;
 }) {
+    // const pathname = usePathname();
+    // const showFooter = pathname !== "/login";
+
     return (
         <html lang="en">
             <body className={montserrat.className}>

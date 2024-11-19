@@ -13,6 +13,8 @@ if (!connectionString) {
 
 console.log("DB string: ", connectionString);
 
+export const db = createClient;
+
 // Function to create a new database client
 export function createClient(): Client {
     return new Client({

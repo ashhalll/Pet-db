@@ -1,80 +1,65 @@
-"use client";
+'use client';
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { RootState, AppDispatch } from "../app/store/store"; // Import store types
 import { fetchCities } from "../app/store/slices/citiesSlice"; // Fetch cities from store
-import { fetchPetCategories } from "../app/store/slices/petCategoriesSlice"; // Fetch pet categories from store
+import { fetchQualifications } from "../app/store/slices/qualificationsSlice"; // Fetch qualifications from store
 
-interface FilterSectionProps {
+interface VetFilterSectionProps {
     onSearch: (filters: {
         selectedCity: string;
-        selectedSpecies: string;
-        breed: string;
+        selectedQualification: string;
     }) => void;
 }
 
-const FilterSection: React.FC<FilterSectionProps> = ({ onSearch }) => {
+const VetFilterSection: React.FC<VetFilterSectionProps> = ({ onSearch }) => {
     const dispatch = useDispatch<AppDispatch>();
     const { cities } = useSelector((state: RootState) => state.cities); // Get cities from the store
-    const { categories } = useSelector((state: RootState) => state.categories); // Get pet categories (species) from the store
+    const { qualifications } = useSelector((state: RootState) => state.qualifications); // Get qualifications from the store
 
     const [selectedCity, setSelectedCity] = useState("");
-    const [selectedSpecies, setSelectedSpecies] = useState("");
-    const [breed, setBreed] = useState("");
+    const [selectedQualification, setSelectedQualification] = useState("");
 
-    // Fetch cities and pet categories on component mount
+    // Fetch cities and qualifications on component mount
     useEffect(() => {
         dispatch(fetchCities());
-        dispatch(fetchPetCategories());
+        dispatch(fetchQualifications());
     }, [dispatch]);
 
     const handleReset = () => {
         setSelectedCity("");
-        setSelectedSpecies("");
-        setBreed("");
-        onSearch({ selectedCity: "", selectedSpecies: "", breed: "" });
+        setSelectedQualification("");
+        onSearch({ selectedCity: "", selectedQualification: "" });
     };
 
     const handleSearch = () => {
-        onSearch({ selectedCity, selectedSpecies, breed });
+        onSearch({ selectedCity, selectedQualification });
     };
 
     return (
         <div className="bg-gray-100 pt-6">
             <div
                 className="bg-white px-8 py-2 w-700"
-                style={{ margin: "0px 32px", borderRadius: "2rem" }}>
+                style={{ margin: "0px 20px", borderRadius: "2rem" }}>
                 <div className="flex flex-wrap gap-4 mb-4 mt-4 items-center">
-                    {/* Species dropdown */}
+                    {/* Qualifications dropdown */}
                     <div className="flex-1 min-w-[150px]">
-                        <label className="text-xs">Species</label>
+                        <label className="text-xs">Qualification</label>
                         <select
                             className="w-full p-3 border rounded-xl"
-                            value={selectedSpecies}
+                            value={selectedQualification}
                             onChange={(e) =>
-                                setSelectedSpecies(e.target.value)
+                                setSelectedQualification(e.target.value)
                             }>
-                            <option value="">Select Species</option>
-                            {categories.map((category) => (
+                            <option value="">Select Qualification</option>
+                            {qualifications.map((qualification) => (
                                 <option
-                                    key={category.category_id}
-                                    value={category.category_id}>
-                                    {category.category_name}
+                                    key={qualification.id}
+                                    value={qualification.id}>
+                                    {qualification.name}
                                 </option>
                             ))}
                         </select>
-                    </div>
-
-                    {/* Breed input field */}
-                    <div className="flex-1 min-w-[150px]">
-                        <label className="text-xs">Breed</label>
-                        <input
-                            type="text"
-                            className="w-full p-3 border rounded-xl"
-                            value={breed}
-                            onChange={(e) => setBreed(e.target.value)}
-                            placeholder="Enter Breed"
-                        />
                     </div>
 
                     {/* Cities dropdown */}
@@ -113,4 +98,4 @@ const FilterSection: React.FC<FilterSectionProps> = ({ onSearch }) => {
     );
 };
 
-export default FilterSection;
+export default VetFilterSection;
