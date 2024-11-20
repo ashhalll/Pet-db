@@ -52,7 +52,7 @@ const CreateUser = () => {
                 router.push(`/vet-register?user_id=${result.payload.user_id}`);
             } else {
                 // Navigate to the dashboard if the user is not a vet
-                router.push("/dashboard");
+                router.push("/login");
             }
         } catch (error) {
             console.error("Error creating user:", error);
