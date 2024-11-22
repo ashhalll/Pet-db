@@ -83,7 +83,7 @@ const PetGrid: React.FC<PetGridProps> = ({ pets }) => {
                             </div>
                         )}
                     </div>
-            
+
                     <div className="p-4">
                         <h3 className="font-bold text-2xl mb-1">{pet.pet_name}</h3>
                         <p className="text-gray-600 mb-1">
@@ -95,7 +95,7 @@ const PetGrid: React.FC<PetGridProps> = ({ pets }) => {
                     </div>
                 </div>
             </Link>
-            
+
             ))}
         </div>
     );
